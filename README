@@ -3,14 +3,13 @@ A lightweight and fast battery icon that sits in your system tray.
 Based on code from xbattbar-acpi.
 
 Make options:
-  WITH_GTK3=1 to build against gtk3, it is the default option
-  WITH_GTK3=0 to build against gtk2 (version 2.16)
+  WITH_NOTIFY=0 to build without libnotify support, it is the default option
+  WITH_NOTIFY=1 to build with libnotify support
 
-  WITH_NOTIFY=1 to build with libnotify support, it is the default option
-  WITH_NOTIFY=0 to build without libnotify support
+  ICON_THEME=<icon theme> to specify the icon theme to install ('gnome' or 'bluecurve')
 
 Usage:
-  cbatticon [OPTION...] [BATTERY ID]
+  cbatticon [OPTION...]
 
 Help Options:
   -h, --help                       Show help options
@@ -19,28 +18,25 @@ Application Options:
   -v, --version                    Display the version
   -d, --debug                      Display debug information
   -u, --update-interval            Set update interval (in seconds)
-  -i, --icon-type                  Set icon type ('standard', 'notification' or 'symbolic')
+  -i, --icon-type                  Set icon type ('standard', 'notification' or 'gpm')
   -l, --low-level                  Set low battery level (in percent)
   -r, --critical-level             Set critical battery level (in percent)
   -o, --command-low-level          Command to execute when low battery level is reached
   -c, --command-critical-level     Command to execute when critical battery level is reached
   -x, --command-left-click         Command to execute when left clicking on tray icon
-  -n, --hide-notification          Hide the notification popups
+  -n, --hide-notification          Hide the notification popups (when built with libnotify support)
   -t, --list-icon-types            List available icon types
-  -p, --list-power-supplies        List available power supplies (battery and AC)
 
 Default value for options:
   update interval        : 5 seconds
   icon type              : the first one that is available in this sequence:
-                           standard, notification or symbolic
+                           standard, notification or gpm
                            (check your setup with --list-icon-types)
   low level              : 20 percent
   critical level         : 5 percent
   command low level      : none
   command critical level : none
   command left click     : none
-  battery id             : the first one that is reported by sysfs
-                           (check your setup with --list-power-supplies)
 
 Examples:
   cbatticon

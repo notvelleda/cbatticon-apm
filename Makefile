@@ -1,13 +1,10 @@
 # options
 
 ### verbosity: 0 for off, 1 for on (default: off)
-V = 0
-
-### whether to link against gtk3 or gtk2 (default: gtk3)
-WITH_GTK3 = 1
+V ?= 0
 
 ### libnotify support: 0 for off, 1 for on (default: on)
-WITH_NOTIFY = 1
+WITH_NOTIFY ?= 0
 
 # programs
 
@@ -29,13 +26,16 @@ BINDIR = $(PREFIX)/bin
 DOCDIR = $(PREFIX)/share/doc/$(PACKAGE_NAME)-$(VERSION)
 MANDIR = $(PREFIX)/share/man/man1
 NLSDIR = $(PREFIX)/share/locale
+PIXMAPDIR = $(PREFIX)/share/pixmaps/$(PACKAGE_NAME)
 LANGUAGES = bs de el es fr he hr id ja pt_BR ru sk sr tr zh_TW
+ICON_THEME ?= gnome
 
 BIN = $(PACKAGE_NAME)
 SOURCEFILES := $(wildcard *.c)
 OBJECTS := $(patsubst %.c,%.o,$(SOURCEFILES))
 SOURCECATALOGS := $(wildcard *.po)
 TRANSLATIONS := $(patsubst %.po,%.mo,$(SOURCECATALOGS))
+ICONFILES := $(wildcard icons/$(ICON_THEME)/*)
 
 # flags and libs
 
@@ -54,17 +54,13 @@ CFLAGS ?= -O2
 CFLAGS += -Wall -Wno-deprecated-declarations -std=c99
 CFLAGS += $(shell $(PKG_CONFIG) --cflags $(PKG_DEPS))
 
-ifeq ($(WITH_GTK3), 0)
 PKG_DEPS = gtk+-2.0
-else
-PKG_DEPS = gtk+-3.0
-endif
 
 ifeq ($(WITH_NOTIFY),1)
 PKG_DEPS += libnotify
 endif
 
-LIBS += $(shell $(PKG_CONFIG) --libs $(PKG_DEPS)) -lm
+LIBS += $(shell $(PKG_CONFIG) --libs $(PKG_DEPS)) -lm -lapm
 
 # targets
 
@@ -74,7 +70,7 @@ $(BIN): $(OBJECTS)
 	@echo -e '\033[0;35mLinking executable $@\033[0m'
 	$(VERBOSE) $(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
-$(OBJECTS): $(SOURCEFILES)
+%.o: %.c
 	@echo -e '\033[0;32mBuilding object $@\033[0m'
 	$(VERBOSE) $(CC) -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
 
@@ -94,6 +90,11 @@ install: $(BIN) $(TRANSLATIONS)
 	do \
 		$(INSTALL) -d "$(DESTDIR)$(NLSDIR)"/$$language/LC_MESSAGES; \
 		$(INSTALL_DATA) $$language.mo "$(DESTDIR)$(NLSDIR)"/$$language/LC_MESSAGES/$(PACKAGE_NAME).mo; \
+	done
+	$(VERBOSE) $(INSTALL) -d "$(DESTDIR)$(PIXMAPDIR)"
+	$(VERBOSE) for icon_file in $(ICONFILES); \
+	do \
+		$(INSTALL_DATA) $$icon_file "$(DESTDIR)$(PIXMAPDIR)"/; \
 	done
 
 uninstall:
