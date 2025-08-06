@@ -456,7 +456,7 @@ static gboolean get_battery_status (apm_info *info, gint *status)
             break;
     }
 
-    if (info->battery_flags & (1 << 3)) {
+    if (info->battery_flags & (1 << 3) || info->ac_line_status == 0x01) {
         if (info->battery_percentage == 100) {
             *status = CHARGED;
         } else {
